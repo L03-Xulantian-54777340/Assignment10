@@ -1,0 +1,78 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.16/addons/p5.sound.js"></script>
+    <script>
+        var sound, amplitude;
+        var sz = [];
+        var col = [];
+
+        function preload() {
+            sound = loadSound(['Galen Crew - Sleepyhead.mp3']);
+        }
+
+        function setup() {
+            createCanvas(500, 500);
+            frameRate(15);
+
+            amplitude = new p5.Amplitude();
+            amplitude.setInput(sound);
+            for (var i = 0; i < 30; i++) {
+                sz[i] = random(0, 20);
+                col[i] = color(random(255), random(255), random(255));
+            }
+            analyzer = new p5.FFT();
+        }
+
+        function keyPressed() {
+            if (sound.isPlaying()) {
+                sound.stop();
+            } else {
+                sound.loop();
+            }
+        }
+
+        function draw() {
+            background(250);
+            //draw the original 2 balls
+            var level = amplitude.getLevel();
+            var sz1 = map(level, 0, 0.3, 50, 500);
+            var sz3 = map(level, 0, 0.3, 0, 255);
+            fill(50, 100, sz3);
+            noStroke();
+            ellipse(width / 2, height / 2, sz1, sz1);
+            //draw the random balls with random position and random color
+            for (var i = 0; i < 30; i++) {
+                fill(col[i], 90);
+                ellipse(random(width), random(height), sz[i], sz[i]);
+            }
+            waveform = analyzer.waveform();
+            // draw the shape of the waveform
+            stroke(random(255), 50, 100);
+            strokeWeight(10);
+            beginShape();
+            noFill();
+            for (var i = 0; i < waveform.length; i++) {
+                var x = map(i, 0, waveform.length, 0, width);
+                var y = map(waveform[i], -1, 1, -height / 2, height / 2);
+                vertex(x, y + height / 2);
+            }
+            endShape();
+            //text
+            fill(250);
+            rect(0, 460, 500, 80);
+            textAlign(CENTER);
+            fill(230);
+            textSize(25);
+            text("In the wave, I see myself in a big city", width / 2, 465);
+            textSize(10);
+            fill(255);
+            text("press any key to play or stop the music", width / 2, 30);
+        }
+    </script>
+
+</head>
+
+</html>
